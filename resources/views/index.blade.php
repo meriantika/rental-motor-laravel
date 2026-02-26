@@ -1,91 +1,121 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ED.Rent - Rental Motor Cepat & Aman</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
-</head>
-<body class="bg-white">
+@extends('layouts.app')
 
-    <section class="flex flex-col md:flex-row min-h-[85vh] items-stretch">
-        <div class="w-full md:w-1/2 p-10 lg:p-24 flex flex-col justify-center">
-            <h1 class="text-6xl font-extrabold text-blue-600 mb-2">ED.Rent</h1>
-            <h2 class="text-3xl font-bold mb-8 text-gray-800">Website + Dashboard</h2>
-            <div class="max-w-md text-gray-500 text-lg leading-relaxed mb-12">
-                Platform rental motor tercepat dan aman untuk kebutuhan harian, liburan, dan kerja.
-            </div>
-            <div class="flex items-center gap-6">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xs">e</div>
-                    <span class="font-bold text-xl text-gray-800">eduwork</span>
-                </div>
-            </div>
-        </div>
-        <div class="w-full md:w-1/2 relative bg-gray-200">
-            <img src="{{ asset('images/rental-motor.jpeg') }}" class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-black/30 flex items-center p-12">
-                <h3 class="text-white text-5xl font-bold leading-tight">
-                    Rental Motor <br> Cepat & Aman, <br> Mulai Rp75.000/ <br> hari
-                </h3>
-            </div>
-        </div>
-    </section>
-
-    <div class="max-w-6xl mx-auto px-6 -mt-16 relative z-30">
-        <form action="/" method="GET" class="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100 flex flex-wrap md:flex-nowrap items-end gap-4">
-            <div class="flex-1 min-w-[200px]">
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Cari Motor</label>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Contoh: NMAX..." class="w-full bg-gray-50 border rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
-            <div class="w-full md:w-48">
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Durasi Sewa</label>
-                <select class="w-full bg-gray-50 border rounded-xl py-3 px-4 outline-none font-semibold text-gray-700">
-                    <option>1 Hari</option>
-                    <option>3 Hari</option>
-                    <option>7 Hari</option>
-                    <option>30 Hari</option>
-                </select>
-            </div>
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-10 py-3 rounded-xl transition shadow-lg shadow-blue-200">Cari</button>
-        </form>
+@section('content')
+<div class="container py-5">
+    {{-- Header Section --}}
+    <div class="header-section mb-5">
+        <h2 class="fw-bold text-dark text-uppercase tracking-tighter">Manajemen Transaksi</h2>
+        <p class="text-muted italic small">Validasi bukti pembayaran dan kelola status penyewaan pelanggan.</p>
     </div>
 
-    <section id="list-motor" class="py-20 px-10 lg:px-24 bg-gray-50">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex justify-between items-end mb-12">
-                <h3 class="text-3xl font-extrabold text-gray-900">Pilihan Motor</h3>
-                <a href="/motor/create" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700">+ Tambah Motor</a>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                @forelse ($motors as $motor)
-                    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all group">
-                        <div class="h-60 bg-gray-100 overflow-hidden relative">
-                            <img src="{{ asset('storage/' . $motor->gambar) }}" alt="{{ $motor->nama_motor }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                            <span class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-blue-600 uppercase">{{ $motor->brand }}</span>
-                        </div>
-                        <div class="p-8">
-                            <h4 class="text-2xl font-bold text-gray-800">{{ $motor->nama_motor }}</h4>
-                            <div class="mt-6 flex justify-between items-center">
-                                <div>
-                                    <p class="text-orange-500 text-2xl font-black">Rp {{ number_format($motor->harga_per_hari, 0, ',', '.') }}</p>
-                                    <span class="text-gray-400 text-sm">/ hari</span>
+    {{-- Notifikasi Sukses --}}
+    @if(session('success'))
+        <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4">
+            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+        </div>
+    @endif
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr class="text-uppercase small tracking-wider">
+                        <th class="px-4 py-3">Pelanggan</th>
+                        <th class="py-3">Unit Motor</th>
+                        <th class="py-3">Total Bayar</th>
+                        <th class="py-3 text-center">Bukti Transfer</th>
+                        <th class="py-3">Status</th>
+                        <th class="px-4 py-3 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($rentals as $item)
+                    <tr>
+                        <td class="px-4">
+                            <div class="fw-bold text-dark">{{ $item->user->name ?? 'User' }}</div>
+                            <div class="small text-muted">{{ $item->user->email ?? '-' }}</div>
+                        </td>
+                        <td>
+                            <div class="fw-bold">{{ $item->motor->nama_motor ?? 'Motor' }}</div>
+                            <div class="small text-muted">{{ $item->total_days }} Hari</div>
+                        </td>
+                        <td>
+                            <span class="fw-bold text-primary">Rp {{ number_format($item->total_price, 0, ',', '.') }}</span>
+                        </td>
+                        <td class="text-center">
+                            @if($item->bukti_pembayaran)
+                                <button type="button" class="btn btn-sm btn-info text-white rounded-pill px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#viewBukti{{ $item->id }}">
+                                    LIHAT BUKTI
+                                </button>
+                            @else
+                                <span class="text-muted small italic">Belum Upload</span>
+                            @endif
+                        </td>
+                        <td>
+                            @php
+                                $badgeClass = [
+                                    'pending' => 'bg-secondary',
+                                    'waiting_verification' => 'bg-warning text-dark',
+                                    'confirmed' => 'bg-success',
+                                    'cancelled' => 'bg-danger'
+                                ][$item->status] ?? 'bg-light';
+                            @endphp
+                            <span class="badge {{ $badgeClass }} rounded-pill px-3 py-2 small fw-bold">
+                                {{ strtoupper(str_replace('_', ' ', $item->status)) }}
+                            </span>
+                        </td>
+                        <td class="px-4 text-center">
+                            @if($item->status == 'waiting_verification')
+                                <div class="d-flex justify-content-center gap-2">
+                                    {{-- Form Konfirmasi --}}
+                                    <form action="{{ route('admin.rentals.update', $item->id) }}" method="POST">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="status" value="confirmed">
+                                        <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-bold" onclick="return confirm('Konfirmasi pembayaran ini?')">SETUJU</button>
+                                    </form>
+                                    
+                                    {{-- Form Tolak --}}
+                                    <form action="{{ route('admin.rentals.update', $item->id) }}" method="POST">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="status" value="cancelled">
+                                        <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold" onclick="return confirm('Tolak transaksi ini?')">TOLAK</button>
+                                    </form>
                                 </div>
-                                <button class="bg-orange-500 text-white font-bold px-6 py-3 rounded-xl hover:bg-orange-600 transition">Sewa</button>
+                            @else
+                                <span class="text-muted small">—</span>
+                            @endif
+                        </td>
+                    </tr>
+
+                    {{-- Modal Popup untuk Melihat Bukti Transfer --}}
+                    @if($item->bukti_pembayaran)
+                    <div class="modal fade" id="viewBukti{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg rounded-4">
+                                <div class="modal-header bg-dark text-white rounded-top-4">
+                                    <h5 class="modal-title fw-bold">BUKTI TRANSFER: {{ strtoupper($item->user->name) }}</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center p-4">
+                                    <img src="{{ asset('storage/' . $item->bukti_pembayaran) }}" 
+                                         class="img-fluid rounded-3 shadow-sm" 
+                                         alt="Bukti Transfer"
+                                         style="max-height: 500px;">
+                                    <div class="mt-3 p-3 bg-light rounded-3 text-start">
+                                        <p class="mb-1 small"><b>Total Tagihan:</b> Rp {{ number_format($item->total_price, 0, ',', '.') }}</p>
+                                        <p class="mb-0 small"><b>Tanggal Sewa:</b> {{ $item->start_date }} - {{ $item->end_date }}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                @empty
-                    <div class="col-span-full text-center py-20 bg-white rounded-3xl border-2 border-dashed">
-                        <p class="text-gray-400 italic">Belum ada motor yang di-input ke katalog.</p>
-                    </div>
-                @endforelse
-            </div>
+                    @endif
+                    @endforeach
+                </tbody>
+            </table>
         </div>
-    </section>
-
-</body>
-</html>
+    </div>
+</div>
+@endsection

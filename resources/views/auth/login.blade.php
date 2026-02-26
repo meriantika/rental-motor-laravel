@@ -5,52 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - MotoRent ID</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #F8FAFC; 
+        }
+    </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
-    <div class="max-w-md w-full">
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-xl text-white mb-4 shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+            <div class="flex justify-center items-center gap-2 mb-2">
+                <div class="bg-blue-600 p-2 rounded-lg shadow-md shadow-blue-200">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <span class="text-xl font-extrabold text-blue-900 tracking-tight">MotoRent ID</span>
             </div>
-            <h1 class="text-2xl font-extrabold text-slate-900">MotoRent ID</h1>
-            <p class="text-slate-500 mt-2">Masuk untuk mengelola rental motor Anda.</p>
+            <h2 class="text-2xl font-bold text-gray-800">Selamat Datang</h2>
+            <p class="text-gray-500 text-sm">Silakan masuk ke akun Anda</p>
         </div>
 
-        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-            @if ($errors->any())
-                <div class="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded">
-                    @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
-                    @endforeach
-                </div>
-            @endif
-
-            <form action="{{ route('login.post') }}" method="POST" class="space-y-5">
-                @csrf
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Email</label>
-                    <input type="email" name="email" value="{{ old('email') }}" required
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none transition"
-                        placeholder="nama@email.com">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Password</label>
-                    <input type="password" name="password" required
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none transition"
-                        placeholder="••••••••">
-                </div>
-                <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition transform active:scale-95">
-                    Masuk Sekarang
-                </button>
-            </form>
-            <div class="mt-8 text-center">
-                <p class="text-sm text-slate-500">Belum punya akun? <a href="{{ route('register') }}" class="text-blue-600 font-bold hover:underline">Daftar Sekarang</a></p>
+        {{-- Alert Sukses --}}
+        @if(session('success'))
+            <div class="mb-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 text-sm rounded-lg flex items-start animate-pulse-once">
+                <svg class="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <span>{{ session('success') }}</span>
             </div>
+        @endif
+
+        {{-- Alert Error --}}
+        @if(session('error') || $errors->any())
+            <div class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded-lg">
+                <div class="flex items-center mb-2 font-bold">
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Gagal Masuk:</span>
+                </div>
+                <ul class="list-disc list-inside ml-8 space-y-1 text-sm">
+                    @if(session('error'))
+                        <li>{{ session('error') }}</li>
+                    @endif
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        {{-- Form Input Login --}}
+        <form action="{{ route('login.post') }}" method="POST" class="space-y-5">
+            @csrf
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Alamat Email</label>
+                <input type="email" name="email" value="{{ old('email') }}" required autofocus
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
+                    placeholder="nama@email.com">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+                <input type="password" name="password" required
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
+                    placeholder="••••••••">
+            </div>
+
+            <button type="submit" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-100 transition duration-300 transform active:scale-[0.98]">
+                Masuk Sekarang
+            </button>
+        </form>
+
+        <div class="mt-8 text-center text-sm text-gray-600 border-t border-gray-50 pt-6">
+            Belum punya akun? 
+            <a href="{{ route('register') }}" class="text-blue-600 font-bold hover:underline ml-1">Daftar sekarang</a>
         </div>
     </div>
+
 </body>
 </html>

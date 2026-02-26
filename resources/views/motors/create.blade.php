@@ -71,6 +71,7 @@
                         <select name="type" class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:border-blue-500 transition bg-white shadow-sm appearance-none">
                             <option value="Matic">Matic</option>
                             <option value="Manual">Manual</option>
+                            <option value="Sport">Sport</option>
                         </select>
                     </div>
                     <div>

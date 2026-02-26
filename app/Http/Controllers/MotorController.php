@@ -7,70 +7,105 @@ use Illuminate\Http\Request;
 
 class MotorController extends Controller
 {
-    public function index()
+    /**
+     * Menampilkan halaman Home dengan data motor untuk slider.
+     */
+    public function home()
     {
-        $motors = Motor::all();
+        $motors = Motor::latest()->get(); 
+        return view('home', compact('motors'));
+    }
+
+    /**
+     * Menampilkan halaman Katalog khusus untuk user melakukan sewa.
+     * Kode ini diletakkan di sini agar route 'katalog.index' berfungsi.
+     */
+    public function katalog()
+    {
+        // Mengambil semua data motor dari database
+        $motors = Motor::all(); 
+        
+        // Mengarahkan ke file resources/views/katalog.blade.php
+        return view('katalog', compact('motors'));
+    }
+
+    /**
+     * Menampilkan katalog motor di Dashboard (untuk pencarian).
+     */
+    public function index(Request $request)
+    {
+        $query = Motor::query();
+
+        if ($request->has('search') && $request->search != '') {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->has('brand') && $request->brand != '') {
+            $query->where('brand', $request->brand);
+        }
+
+        $motors = $query->latest()->get();
+
         return view('dashboard', compact('motors'));
     }
 
-    public function create()
+    public function create() 
     {
-        return view('motors.create');
+        return view('motors.create'); 
     }
 
     public function store(Request $request)
     {
-        // Validasi data
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:255',
+            'image_url' => 'required|url',
             'brand' => 'required',
-            'type' => 'required',
             'cc' => 'required|numeric',
+            'type' => 'required|in:Matic,Manual,Sport',
             'price_per_day' => 'required|numeric',
         ]);
 
-        // Simpan ke database
-        Motor::create($request->all());
+        Motor::create([
+            'name' => $request->name,
+            'image_url' => $request->image_url,
+            'brand' => $request->brand,
+            'cc' => $request->cc,
+            'type' => $request->type,
+            'price_per_day' => $request->price_per_day,
+        ]);
 
-        return redirect()->route('dashboard')->with('success', 'Motor berhasil ditambahkan ke katalog!');
+        return redirect()->route('dashboard')->with('success', 'Unit motor baru berhasil ditambahkan!');
     }
 
-    public function edit(Motor $motor)
+    public function edit($id)
     {
-        // Menggunakan Route Model Binding (Motor $motor) secara otomatis mencari ID yang sesuai
+        $motor = Motor::findOrFail($id);
         return view('motors.edit', compact('motor'));
     }
 
-    /**
-     * Memperbarui data motor di database.
-     */
-    public function update(Request $request, Motor $motor)
+    public function update(Request $request, $id)
     {
-        // Validasi data (sama seperti store)
+        $motor = Motor::findOrFail($id);
+
         $request->validate([
-            'name'          => 'required|string|max:255',
-            'brand'         => 'required|string',
-            'type'          => 'required|string',
-            'cc'            => 'required|numeric',
+            'name' => 'required',
+            'image_url' => 'required|url',
+            'brand' => 'required',
+            'cc' => 'required|numeric',
+            'type' => 'required|in:Matic,Manual,Sport',
             'price_per_day' => 'required|numeric',
-            'image_url'     => 'nullable|url',
         ]);
 
-        // Update data di database
         $motor->update($request->all());
 
         return redirect()->route('dashboard')->with('success', 'Data motor berhasil diperbarui!');
     }
 
-    /**
-     * Menghapus data motor dari database.
-     */
-    public function destroy(Motor $motor)
+    public function destroy($id)
     {
-        // Hapus data dari database
+        $motor = Motor::findOrFail($id);
         $motor->delete();
 
-        // Kembali ke halaman dashboard dengan pesan sukses
-        return redirect()->route('dashboard')->with('success', 'Motor berhasil dihapus dari katalog!');
+        return redirect()->route('dashboard')->with('success', 'Motor berhasil dihapus!');
     }
 }
