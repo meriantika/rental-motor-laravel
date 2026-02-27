@@ -34,17 +34,14 @@ class MotorController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Motor::query();
-
-        if ($request->has('search') && $request->search != '') {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        if ($request->has('brand') && $request->brand != '') {
-            $query->where('brand', $request->brand);
-        }
-
-        $motors = $query->latest()->get();
+        $motors = Motor::query()
+            ->when($request->search, fn($q,$search) => 
+                $q->where('name','like',"%{$search}%"))
+            ->when($request->brand, fn($q,$brand) => 
+                $q->where('brand',$brand))
+            ->latest()
+            ->paginate(3)
+            ->withQueryString();
 
         return view('dashboard', compact('motors'));
     }

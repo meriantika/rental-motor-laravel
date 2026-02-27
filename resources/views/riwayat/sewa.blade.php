@@ -1,102 +1,130 @@
-@extends('layouts.app') {{-- Menghubungkan ke resources/views/layouts/app.blade.php --}}
+@extends('layouts.app')
 
 @section('content')
 <div class="container py-5">
-    {{-- Header Halaman --}}
-    <div class="header-section mb-5">
-        <h2 class="fw-bold text-dark text-uppercase tracking-tight">RIWAYAT SEWA</h2>
-        <p class="text-muted">Daftar pesanan unit armada Anda. Silakan konfirmasi pembayaran melalui WhatsApp.</p>
+
+    <div class="mb-5">
+        <h2 class="fw-bold display-6">Riwayat Sewa</h2>
+        <p class="text-muted">Lihat detail transaksi penyewaan motor Anda.</p>
     </div>
 
-    {{-- Notifikasi Sukses --}}
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4" role="alert">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-check-circle me-2"></i>
-                {{ session('success') }}
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
 
-    <div class="rental-list">
-        @forelse($rentals as $item)
-            {{-- 1. Kartu Pesanan --}}
-            <div class="card border-0 shadow-sm rounded-4 mb-4 p-3 hover-shadow transition">
-                <div class="row align-items-center">
-                    <div class="col-md-2 text-center">
-                        @if($item->motor && $item->motor->foto)
-                            <img src="{{ asset('storage/' . $item->motor->foto) }}" 
-                                 alt="{{ $item->motor->nama_motor }}" 
-                                 class="img-fluid rounded-4 shadow-sm" 
-                                 style="height: 100px; width: 100%; object-fit: cover;"
-                                 onerror="this.onerror=null;this.src='{{ asset('img/no-motor.png') }}';">
-                        @else
-                            <div class="bg-light rounded-4 d-flex align-items-center justify-content-center" style="height: 100px; width: 100%;">
-                                <i class="fas fa-motorcycle fa-2x text-muted"></i>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="col-md-5">
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <h4 class="fw-bold mb-0 text-uppercase">{{ $item->motor->nama_motor ?? 'Unit Tidak Diketahui' }}</h4>
-                            <span class="badge bg-light text-primary border-primary border-opacity-10">{{ $item->motor->cc ?? '-' }} CC</span>
-                        </div>
-                        <p class="text-muted mb-0 small">
-                            <i class="far fa-calendar-alt me-1"></i>
-                            {{ date('d M', strtotime($item->start_date)) }} — {{ date('d M Y', strtotime($item->end_date)) }} 
-                            | <span class="text-primary fw-bold">{{ $item->total_days }} HARI</span>
-                        </p>
-                    </div>
-                    <div class="col-md-3 text-md-end">
-                        <p class="text-muted small mb-0">TOTAL BAYAR</p>
-                        <h4 class="fw-bold mb-0 text-primary">Rp {{ number_format($item->total_price, 0, ',', '.') }}</h4>
-                    </div>
-                    <div class="col-md-2 text-center">
-                        {{-- Logika Status & Tombol WhatsApp --}}
-                        @if($item->status == 'pending')
-                            <a href="https://wa.me/6281234567890?text=Halo%20Admin%20MotoRent%20ID,%20saya%20ingin%20konfirmasi%20pembayaran%20untuk%20pesanan%20{{ $item->motor->nama_motor }}%20dengan%20ID%20Sewa:%20{{ $item->id }}" 
-                               target="_blank"
-                               class="btn btn-success w-100 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
-                                <i class="fab fa-whatsapp"></i> KONFIRMASI WA
-                            </a>
-                        @elseif($item->status == 'waiting_verification')
-                            <span class="badge bg-warning text-dark py-2 px-3 rounded-pill w-100 d-flex align-items-center justify-content-center gap-2">
-                                <i class="fas fa-clock"></i> MENUNGGU VALIDASI
-                            </span>
-                        @elseif($item->status == 'confirmed')
-                            <span class="badge bg-success py-2 px-3 rounded-pill w-100 d-flex align-items-center justify-content-center gap-2">
-                                <i class="fas fa-check"></i> BERHASIL
-                            </span>
-                            <button class="btn btn-outline-primary btn-sm w-100 mt-2 rounded-pill fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalReview{{ $item->id }}">
-                                BERI ULASAN
-                            </button>
-                        @elseif($item->status == 'cancelled')
-                            <span class="badge bg-danger py-2 px-3 rounded-pill w-100">DIBATALKAN</span>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        @empty
-            <div class="text-center py-5">
-                <div class="mb-3 text-muted opacity-50">
-                    <i class="fas fa-motorcycle fa-4x"></i>
-                </div>
-                <p class="text-muted mb-4 font-medium">Belum ada riwayat penyewaan.</p>
-                <a href="{{ route('katalog') }}" class="btn btn-primary px-5 py-2 rounded-pill fw-bold shadow-sm">Cek Katalog Sekarang</a>
-            </div>
-        @endforelse
-    </div>
+    {{-- ==================== SEDANG BERJALAN ==================== --}}
+    <h5 class="section-title text-warning">Sedang Berjalan</h5>
+
+    @forelse($rentalsAktif as $item)
+        @include('riwayat._card', ['item' => $item])
+    @empty
+        <p class="text-muted mb-4">Tidak ada sewa aktif.</p>
+    @endforelse
+
+
+
+    {{-- ==================== SELESAI ==================== --}}
+    <h5 class="section-title text-success mt-5">Riwayat Selesai</h5>
+
+    @forelse($rentalsSelesai as $item)
+        @include('riwayat._card', ['item' => $item])
+    @empty
+        <p class="text-muted mb-4">Belum ada transaksi selesai.</p>
+    @endforelse
+
+
+
+    {{-- ==================== DIBATALKAN ==================== --}}
+    <h5 class="section-title text-danger mt-5">Dibatalkan</h5>
+
+    @forelse($rentalsBatal as $item)
+        @include('riwayat._card', ['item' => $item])
+    @empty
+        <p class="text-muted">Tidak ada transaksi dibatalkan.</p>
+    @endforelse
+
 </div>
 
+
+
 <style>
-    .hover-shadow:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.075)!important;
-    }
-    .transition { transition: all 0.3s ease; }
-    .text-primary { color: #0d6efd !important; }
-    .btn-success { background-color: #25d366 !important; border-color: #25d366 !important; }
-    .btn-success:hover { background-color: #128c7e !important; border-color: #128c7e !important; }
+.section-title {
+    font-weight:600;
+    margin-bottom:20px;
+}
+
+.card-modern {
+    background:#ffffff;
+    border-radius:24px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.04);
+    transition:0.3s ease;
+    margin-bottom:20px;
+    padding:24px;
+}
+.card-modern:hover {
+    transform:translateY(-4px);
+    box-shadow:0 12px 40px rgba(0,0,0,0.08);
+}
+
+.image-wrapper {
+    background:#f8fafc;
+    border-radius:20px;
+    height:110px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.image-wrapper img {
+    max-height:90px;
+    object-fit:contain;
+}
+.placeholder-icon {
+    font-size:28px;
+    color:#94a3b8;
+}
+
+.badge-soft {
+    display:inline-block;
+    background:#eef2ff;
+    color:#4338ca;
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.btn-modern {
+    display:inline-block;
+    background:linear-gradient(135deg,#22c55e,#16a34a);
+    color:white;
+    padding:10px 18px;
+    border-radius:999px;
+    font-weight:600;
+    text-decoration:none;
+    transition:0.3s;
+}
+.btn-modern:hover { opacity:0.85; }
+
+.status-success {
+    background:#dcfce7;
+    color:#166534;
+    padding:8px 14px;
+    border-radius:999px;
+    font-weight:600;
+}
+
+.status-warning {
+    background:#fef9c3;
+    color:#854d0e;
+    padding:8px 14px;
+    border-radius:999px;
+    font-weight:600;
+}
+
+.status-danger {
+    background:#fee2e2;
+    color:#991b1b;
+    padding:8px 14px;
+    border-radius:999px;
+    font-weight:600;
+}
 </style>
+
 @endsection

@@ -38,8 +38,8 @@
             <span class="text-xl font-bold text-blue-600 tracking-tighter">MotoRent ID</span>
         </a>
         <div class="flex items-center gap-6">
-            <a href="{{ route('katalog') }}" class="text-sm font-bold text-slate-500 hover:text-blue-600 uppercase tracking-widest transition-colors no-underline">
-                Kembali ke Katalog
+            <a href="{{ route('dashboard') }}" class="text-sm font-bold text-slate-500 hover:text-blue-600 uppercase tracking-widest transition-colors no-underline">
+                Kembali ke dashboard
             </a>
         </div>
     </nav>
