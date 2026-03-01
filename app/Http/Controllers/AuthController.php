@@ -35,11 +35,11 @@ class AuthController extends Controller
 
             // Cek role user untuk menentukan arah redirect
             if (Auth::user()->role === 'admin') {
-                return redirect()->intended('/dashboard')->with('success', 'Selamat datang kembali, Admin!');
+                return redirect()->route('dashboard')->with('success', 'Selamat datang kembali, Admin!');
             }
 
             // Jika User biasa, diarahkan ke katalog agar tidak 404
-            return redirect()->intended('/katalog')->with('success', 'Selamat datang di MotoRent ID!');
+            return redirect()->intended('/dashboard')->with('success', 'Selamat datang di MotoRent ID!');
         }
 
         // 3. Jika gagal login, kirim pesan error session

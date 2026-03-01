@@ -43,6 +43,14 @@ Route::middleware(['auth'])->group(function () {
     // Simpan booking
     Route::post('/sewa/{id}', [SewaController::class, 'store'])->name('sewa.store');
 
+    // ✅ KONFIRMASI SEWA
+    Route::post('/sewa/{id}/confirm', [SewaController::class, 'confirm'])
+        ->name('sewa.confirm');
+
+    // ✅ BATALKAN SEWA
+    Route::post('/sewa/{id}/cancel', [SewaController::class, 'cancel'])
+        ->name('sewa.cancel');
+
     // Riwayat sewa user
     Route::get('/riwayat-sewa', [SewaController::class, 'riwayat'])->name('rentals.index');
 
@@ -58,8 +66,10 @@ Route::middleware(['auth'])->group(function () {
 
         Route::resource('motors', MotorController::class)->except(['index', 'show']);
 
-        Route::get('/admin/rentals', [SewaController::class, 'adminIndex'])->name('admin.rentals.index');
+        Route::get('/admin/rentals', [SewaController::class, 'adminIndex'])
+            ->name('admin.rentals.index');
 
-        Route::patch('/admin/rentals/{id}', [SewaController::class, 'updateStatus'])->name('admin.rentals.update');
+        Route::patch('/admin/rentals/{id}', [SewaController::class, 'updateStatus'])
+            ->name('admin.rentals.update');
     });
 });

@@ -7,6 +7,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -72,16 +73,33 @@
 
     <div class="flex items-center gap-8">
 
-        <a href="{{ route('rentals.index') }}"
-           class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition">
-            Riwayat Sewa
-        </a>
+        {{-- ROLE BASED MENU --}}
+        @if(Auth::user()->role == 'admin')
+            <a href="{{ route('admin.rentals.index') }}"
+               class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition">
+                Kelola Transaksi
+            </a>
+        @else
+            <a href="{{ route('rentals.index') }}"
+               class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition">
+                Riwayat Sewa
+            </a>
+        @endif
 
         <div class="hidden md:block text-right border-l pl-6 border-slate-200">
             <p class="text-sm font-bold">{{ Auth::user()->name }}</p>
-            <p class="text-xs text-slate-400 uppercase">
-                {{ Auth::user()->role }}
-            </p>
+
+            <div class="flex items-center justify-end gap-2">
+                <p class="text-xs text-slate-400 uppercase">
+                    {{ Auth::user()->role }}
+                </p>
+
+                @if(Auth::user()->role == 'admin')
+                    <span class="bg-purple-600 text-white text-[10px] px-3 py-1 rounded-full font-bold">
+                        ADMIN MODE
+                    </span>
+                @endif
+            </div>
         </div>
 
         <form action="{{ route('logout') }}" method="POST">
@@ -97,9 +115,18 @@
 <div class="max-w-7xl mx-auto p-8">
 
     {{-- HEADER --}}
-    <div class="mb-12">
-        <h1 class="text-4xl font-black uppercase tracking-tight">Katalog Motor</h1>
-        <p class="text-slate-500 mt-2">Pilih armada terbaik untuk perjalanan Anda.</p>
+    <div class="mb-12 flex justify-between items-center">
+        <div>
+            <h1 class="text-4xl font-black uppercase tracking-tight">Katalog Motor</h1>
+            <p class="text-slate-500 mt-2">Pilih armada terbaik untuk perjalanan Anda.</p>
+        </div>
+
+        @if(Auth::user()->role == 'admin')
+        <a href="{{ route('motors.create') }}"
+           class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:scale-105 transition">
+            + Tambah Motor
+        </a>
+        @endif
     </div>
 
     {{-- FILTER --}}
@@ -148,7 +175,28 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
 
         @forelse($motors as $motor)
-        <div class="bg-white rounded-3xl border overflow-hidden shadow-sm card-hover">
+        <div class="bg-white rounded-3xl border overflow-hidden shadow-sm card-hover relative">
+
+            @if(Auth::user()->role == 'admin')
+            <div class="absolute top-4 right-4 flex gap-2 z-20">
+                <a href="{{ route('motors.edit', $motor->id) }}"
+                   class="bg-white p-2 rounded-xl shadow-md hover:bg-yellow-400 hover:text-white transition">
+                    ✏
+                </a>
+
+                <form id="delete-form-{{ $motor->id }}"
+                      action="{{ route('motors.destroy', $motor->id) }}"
+                      method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button"
+                            onclick="confirmDelete({{ $motor->id }})"
+                            class="bg-white p-2 rounded-xl shadow-md hover:bg-red-500 hover:text-white transition">
+                        🗑
+                    </button>
+                </form>
+            </div>
+            @endif
 
             <div class="h-60 bg-slate-100 flex items-center justify-center">
                 @if($motor->image_url)
@@ -168,27 +216,19 @@
                     Rp {{ number_format($motor->price_per_day,0,',','.') }}
                 </p>
 
+                @if(Auth::user()->role == 'user')
                 <form action="{{ route('sewa.store',$motor->id) }}" method="POST" class="space-y-3">
                     @csrf
-
-                    <input type="date"
-                           name="start_date"
-                           required
-                           min="{{ date('Y-m-d') }}"
+                    <input type="date" name="start_date" required min="{{ date('Y-m-d') }}"
                            class="w-full bg-slate-100 rounded-xl px-3 py-2 text-sm">
-
-                    <input type="date"
-                           name="end_date"
-                           required
-                           min="{{ date('Y-m-d') }}"
+                    <input type="date" name="end_date" required min="{{ date('Y-m-d') }}"
                            class="w-full bg-slate-100 rounded-xl px-3 py-2 text-sm">
-
                     <button class="w-full bg-slate-900 text-white py-3 rounded-2xl font-bold hover:bg-blue-600 transition">
                         Sewa Sekarang
                     </button>
                 </form>
+                @endif
             </div>
-
         </div>
         @empty
         <div class="col-span-full text-center py-20">
@@ -198,12 +238,30 @@
 
     </div>
 
-    {{-- PAGINATION --}}
     <div class="dashboard-pagination">
         {{ $motors->withQueryString()->links('pagination.dashboard') }}
     </div>
 
 </div>
+
+<script>
+function confirmDelete(id) {
+    Swal.fire({
+        title: 'Hapus Motor?',
+        text: "Data yang dihapus tidak bisa dikembalikan.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('delete-form-' + id).submit();
+        }
+    });
+}
+</script>
 
 </body>
 </html>

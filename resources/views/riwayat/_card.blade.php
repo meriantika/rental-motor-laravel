@@ -1,58 +1,83 @@
-@php $motor = $item->motor; @endphp
+<div class="card-modern d-flex justify-content-between align-items-center">
 
-<div class="card-modern">
-    <div class="row align-items-center">
+    <div class="d-flex align-items-center gap-4">
 
-        <div class="col-md-2">
-            <div class="image-wrapper">
-                @if($motor && $motor->foto)
-                    <img src="{{ asset('storage/' . $motor->foto) }}">
-                @else
-                    <div class="placeholder-icon">
-                        <i class="fas fa-motorcycle"></i>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <div class="col-md-5">
-            <h4 class="fw-semibold mb-1">
-                {{ optional($motor)->nama_motor ?? optional($motor)->name }}
-            </h4>
-
-            <span class="badge-soft mb-2">
-                {{ optional($motor)->cc ?? '-' }} CC
-            </span>
-
-            <p class="text-muted small mb-0">
-                {{ date('d M Y', strtotime($item->start_date)) }}
-                —
-                {{ date('d M Y', strtotime($item->end_date)) }}
-                •
-                <span class="text-primary fw-semibold">
-                    {{ $item->total_days }} Hari
-                </span>
-            </p>
-        </div>
-
-        <div class="col-md-3 text-md-end">
-            <p class="text-muted small mb-1">Total Bayar</p>
-            <h4 class="fw-bold text-success">
-                Rp {{ number_format($item->total_price,0,',','.') }}
-            </h4>
-        </div>
-
-        <div class="col-md-2 text-center">
-            @if($item->status == 'pending')
-                <a href="#" class="btn-modern">Konfirmasi</a>
-            @elseif($item->status == 'waiting_verification')
-                <span class="status-warning">Menunggu</span>
-            @elseif($item->status == 'confirmed')
-                <span class="status-success">Berhasil</span>
-            @elseif($item->status == 'cancelled')
-                <span class="status-danger">Dibatalkan</span>
+        <div class="image-wrapper">
+            @if($item->motor->image_url)
+                <img src="{{ $item->motor->image_url }}">
+            @else
+                <div class="placeholder-icon">🏍️</div>
             @endif
         </div>
 
+        <div>
+            <h5 class="fw-bold mb-1">{{ $item->motor->name }}</h5>
+
+            <span class="badge-soft">
+                {{ $item->motor->cc }} CC
+            </span>
+
+            <div class="mt-2 text-muted">
+                {{ \Carbon\Carbon::parse($item->start_date)->format('d M Y') }}
+                —
+                {{ \Carbon\Carbon::parse($item->end_date)->format('d M Y') }}
+                • {{ $item->total_days }} Hari
+            </div>
+        </div>
     </div>
+
+    <div class="text-end">
+
+        <div class="mb-2 text-muted">Total Bayar</div>
+        <div class="fw-bold fs-5 text-success mb-3">
+            Rp {{ number_format($item->total_price,0,',','.') }}
+        </div>
+
+        {{-- ================== BUTTON AREA ================== --}}
+        <div class="d-flex gap-2 justify-content-end">
+
+            {{-- STATUS PENDING --}}
+            @if($item->status == 'pending')
+
+                <form action="{{ route('sewa.confirm', $item->id) }}" method="POST">
+                    @csrf
+                    <button class="btn btn-success rounded-pill px-4">
+                        Konfirmasi
+                    </button>
+                </form>
+
+                <form action="{{ route('sewa.cancel', $item->id) }}" method="POST">
+                    @csrf
+                    <button class="btn btn-danger rounded-pill px-4">
+                        Batalkan
+                    </button>
+                </form>
+
+            {{-- STATUS MENUNGGU VERIFIKASI ADMIN --}}
+            @elseif($item->status == 'waiting_verification')
+
+                <span class="status-warning">
+                    Menunggu Verifikasi Admin
+                </span>
+
+            {{-- STATUS BERHASIL --}}
+            @elseif($item->status == 'confirmed')
+
+                <span class="status-success">
+                    Berhasil
+                </span>
+
+            {{-- STATUS DIBATALKAN --}}
+            @elseif($item->status == 'cancelled')
+
+                <span class="status-danger">
+                    Dibatalkan
+                </span>
+
+            @endif
+
+        </div>
+
+    </div>
+
 </div>
