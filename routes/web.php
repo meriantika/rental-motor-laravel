@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MotorController;
 use App\Http\Controllers\SewaController;
+use App\Http\Controllers\ReviewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,6 +57,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Upload pembayaran
     Route::post('/payment/upload/{id}', [SewaController::class, 'uploadPayment'])->name('payment.upload');
+
+    // Review Motor
+    Route::post('/review/{rental}', [ReviewController::class, 'store'])
+    ->name('review.store');
 
     /*
     |--------------------------------------------------------------------------

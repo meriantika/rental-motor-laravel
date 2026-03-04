@@ -78,6 +78,32 @@
 
         </div>
 
+        {{-- ================== FORM REVIEW ================== --}}
+        @if($item->status == 'confirmed')
+
+        <form action="{{ route('review.store',$item->id) }}" method="POST" class="mt-3">
+        @csrf
+
+        <select name="rating" class="border rounded p-2">
+        <option value="5">⭐⭐⭐⭐⭐</option>
+        <option value="4">⭐⭐⭐⭐</option>
+        <option value="3">⭐⭐⭐</option>
+        <option value="2">⭐⭐</option>
+        <option value="1">⭐</option>
+        </select>
+
+        <textarea name="comment"
+        class="border rounded p-2 w-full mt-2"
+        placeholder="Tulis ulasan..."></textarea>
+
+        <button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">
+        Kirim Ulasan
+        </button>
+
+        </form>
+
+        @endif
+
     </div>
 
 </div>

@@ -44,4 +44,8 @@ class Motor extends Model
         'cc' => 'integer',
         'rating' => 'decimal:1',
     ];
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

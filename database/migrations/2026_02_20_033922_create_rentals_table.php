@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up()
     {
         Schema::create('rentals', function (Blueprint $table) {
@@ -19,14 +16,22 @@ return new class extends Migration
             $table->date('end_date');
             $table->integer('total_days');
             $table->integer('total_price');
-            $table->string('status')->default('pending'); // pending, active, completed
+
+            // Kolom upload bukti pembayaran
+            $table->string('payment_proof')->nullable();
+
+            // Status rental
+            $table->enum('status', [
+                'pending',
+                'waiting_verification',
+                'confirmed',
+                'cancelled'
+            ])->default('pending');
+
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('rentals');
