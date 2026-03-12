@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Motor;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 
 class MotorController extends Controller
@@ -18,14 +19,11 @@ class MotorController extends Controller
 
     /**
      * Menampilkan halaman Katalog khusus untuk user melakukan sewa.
-     * Kode ini diletakkan di sini agar route 'katalog.index' berfungsi.
      */
     public function katalog()
     {
-        // Mengambil semua data motor dari database
-        $motors = Motor::all(); 
+        $motors = Motor::with('brand')->get(); 
         
-        // Mengarahkan ke file resources/views/katalog.blade.php
         return view('katalog', compact('motors'));
     }
 
@@ -34,29 +32,62 @@ class MotorController extends Controller
      */
     public function index(Request $request)
     {
-        $motors = Motor::query()
-            ->when($request->search, fn($q,$search) => 
-                $q->where('name','like',"%{$search}%"))
-            ->when($request->brand, fn($q,$brand) => 
-                $q->where('brand',$brand))
+        $brands = Brand::all();
+
+        $motors = Motor::with('brand')
+
+            ->when($request->search, function ($q, $search) {
+                $q->where('name','like',"%{$search}%");
+            })
+
+            ->when($request->brand, function ($q, $brand) {
+                $q->where('brand_id',$brand);
+            })
+
+            ->when($request->min_price, function ($q, $min) {
+                $q->where('price_per_day','>=',$min);
+            })
+
+            ->when($request->max_price, function ($q, $max) {
+                $q->where('price_per_day','<=',$max);
+            })
+
             ->latest()
             ->paginate(3)
             ->withQueryString();
 
-        return view('dashboard', compact('motors'));
+        return view('dashboard', compact('motors','brands'));
     }
 
-    public function create() 
+    /**
+     * Menampilkan detail motor
+     */
+    public function show($id)
     {
-        return view('motors.create'); 
+        $motor = Motor::with('reviews.user','brand')->findOrFail($id);
+
+        return view('motors.show', compact('motor'));
     }
 
+    /**
+     * FORM TAMBAH MOTOR
+     */
+    public function create()
+    {
+        $brands = Brand::all();
+
+        return view('motors.create', compact('brands'));
+    }
+
+    /**
+     * SIMPAN MOTOR
+     */
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'image_url' => 'required|url',
-            'brand' => 'required',
+            'brand_id' => 'required',
             'cc' => 'required|numeric',
             'type' => 'required|in:Matic,Manual,Sport',
             'price_per_day' => 'required|numeric',
@@ -65,21 +96,30 @@ class MotorController extends Controller
         Motor::create([
             'name' => $request->name,
             'image_url' => $request->image_url,
-            'brand' => $request->brand,
+            'brand_id' => $request->brand_id,
             'cc' => $request->cc,
             'type' => $request->type,
             'price_per_day' => $request->price_per_day,
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Unit motor baru berhasil ditambahkan!');
+        return redirect()->route('dashboard')
+            ->with('success', 'Unit motor baru berhasil ditambahkan!');
     }
 
+    /**
+     * FORM EDIT MOTOR
+     */
     public function edit($id)
     {
         $motor = Motor::findOrFail($id);
-        return view('motors.edit', compact('motor'));
+        $brands = Brand::all();
+
+        return view('motors.edit', compact('motor','brands'));
     }
 
+    /**
+     * UPDATE MOTOR
+     */
     public function update(Request $request, $id)
     {
         $motor = Motor::findOrFail($id);
@@ -87,22 +127,34 @@ class MotorController extends Controller
         $request->validate([
             'name' => 'required',
             'image_url' => 'required|url',
-            'brand' => 'required',
+            'brand_id' => 'required',
             'cc' => 'required|numeric',
             'type' => 'required|in:Matic,Manual,Sport',
             'price_per_day' => 'required|numeric',
         ]);
 
-        $motor->update($request->all());
+        $motor->update([
+            'name' => $request->name,
+            'image_url' => $request->image_url,
+            'brand_id' => $request->brand_id,
+            'cc' => $request->cc,
+            'type' => $request->type,
+            'price_per_day' => $request->price_per_day,
+        ]);
 
-        return redirect()->route('dashboard')->with('success', 'Data motor berhasil diperbarui!');
+        return redirect()->route('dashboard')
+            ->with('success', 'Data motor berhasil diperbarui!');
     }
 
+    /**
+     * HAPUS MOTOR
+     */
     public function destroy($id)
     {
         $motor = Motor::findOrFail($id);
         $motor->delete();
 
-        return redirect()->route('dashboard')->with('success', 'Motor berhasil dihapus!');
+        return redirect()->route('dashboard')
+            ->with('success', 'Motor berhasil dihapus!');
     }
 }

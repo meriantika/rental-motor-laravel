@@ -69,14 +69,9 @@ class SewaController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | Konfirmasi Sewa (USER)
+    | Konfirmasi Sewa (USER -> WA ADMIN)
     |--------------------------------------------------------------------------
     */
-    /*
-|--------------------------------------------------------------------------
-| Konfirmasi Sewa (USER -> WA ADMIN)
-|--------------------------------------------------------------------------
-*/
     public function confirm($id)
     {
         $sewa = Rental::with('motor')
@@ -86,13 +81,11 @@ class SewaController extends Controller
 
         if ($sewa->status == 'pending') {
 
-            // Ubah status jadi menunggu verifikasi admin
             $sewa->update([
                 'status' => 'waiting_verification'
             ]);
         }
 
-        // Nomor admin (GANTI dengan nomor WA kamu)
         $adminNumber = '6282179919001';
 
         $message = urlencode(
@@ -180,7 +173,6 @@ class SewaController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        // Statistik
         $totalTransaksi = Rental::count();
         $totalPending = Rental::where('status', 'waiting_verification')->count();
         $totalPendapatan = Rental::where('status', 'confirmed')->sum('total_price');
@@ -202,10 +194,36 @@ class SewaController extends Controller
     {
         $rental = Rental::findOrFail($id);
 
-        $rental->update([
-            'status' => $request->status
-        ]);
+        if($request->hasFile('payment_proof')){
 
-        return back()->with('success', 'Status berhasil diperbarui.');
+            $file = $request->file('payment_proof');
+
+            $filename = time().'_'.$file->getClientOriginalName();
+
+            $file->move(public_path('payment_proofs'), $filename);
+
+            $rental->payment_proof = $filename;
+        }
+
+        $rental->status = $request->status;
+
+        $rental->save();
+
+        return back()->with('success','Transaksi berhasil diverifikasi');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reset Status (ADMIN)
+    |--------------------------------------------------------------------------
+    */
+    public function resetStatus($id)
+    {
+        $rental = Rental::findOrFail($id);
+
+        $rental->status = 'waiting_verification';
+        $rental->save();
+
+        return back()->with('success','Status berhasil dikembalikan ke waiting.');
     }
 }

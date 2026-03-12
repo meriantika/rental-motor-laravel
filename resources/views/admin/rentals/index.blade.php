@@ -53,8 +53,10 @@
                 <tr>
                     <th class="p-4">User</th>
                     <th class="p-4">Motor</th>
-                    <th class="p-4">Tanggal</th>
+                    <th class="p-4">Tanggal Sewa</th>
+                    <th class="p-4">Tanggal Transaksi</th>
                     <th class="p-4">Total</th>
+                    <th class="p-4">Bukti</th>
                     <th class="p-4">Status</th>
                     <th class="p-4 text-center">Aksi</th>
                 </tr>
@@ -72,14 +74,35 @@
                         {{ $rental->motor->name }}
                     </td>
 
+                    {{-- TANGGAL SEWA --}}
                     <td class="p-4">
                         {{ \Carbon\Carbon::parse($rental->start_date)->format('d M Y') }}
                         -
                         {{ \Carbon\Carbon::parse($rental->end_date)->format('d M Y') }}
                     </td>
 
+                    {{-- TANGGAL TRANSAKSI --}}
+                    <td class="p-4 text-slate-600">
+                        {{ \Carbon\Carbon::parse($rental->created_at)->format('d M Y') }}
+                    </td>
+
                     <td class="p-4 font-bold text-green-600">
                         Rp {{ number_format($rental->total_price,0,',','.') }}
+                    </td>
+
+                    {{-- BUKTI TRANSFER --}}
+                    <td class="p-4">
+                    @if($rental->payment_proof)
+
+                    <a href="{{ asset('payment_proofs/'.$rental->payment_proof) }}"
+                       target="_blank"
+                       class="text-blue-600 underline">
+                    Lihat Bukti
+                    </a>
+
+                    @else
+                    <span class="text-slate-400 text-xs">Belum ada</span>
+                    @endif
                     </td>
 
                     {{-- STATUS BADGE --}}
@@ -106,52 +129,70 @@
                     {{-- AKSI --}}
                     <td class="p-4 text-center">
 
-                        @if($rental->status == 'waiting_verification')
+                    @if($rental->status == 'waiting_verification')
 
-                            <div class="flex justify-center gap-2">
+                    <div class="flex justify-center gap-2 items-center">
 
-                                {{-- APPROVE --}}
-                                <form id="approve-{{ $rental->id }}"
-                                      action="{{ route('admin.rentals.update', $rental->id) }}"
-                                      method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="status" value="confirmed">
+                    {{-- APPROVE + UPLOAD BUKTI --}}
+                    <form action="{{ route('admin.rentals.update',$rental->id) }}"
+                          method="POST"
+                          enctype="multipart/form-data"
+                          class="flex items-center gap-2">
 
-                                    <button type="button"
-                                            onclick="approveRental({{ $rental->id }})"
-                                            class="bg-green-500 text-white px-4 py-1 rounded-lg text-xs font-bold hover:bg-green-600 transition">
-                                        ✔ Approve
-                                    </button>
-                                </form>
+                    @csrf
+                    @method('PATCH')
 
-                                {{-- REJECT --}}
-                                <form id="reject-{{ $rental->id }}"
-                                      action="{{ route('admin.rentals.update', $rental->id) }}"
-                                      method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="status" value="cancelled">
+                    <input type="hidden" name="status" value="confirmed">
 
-                                    <button type="button"
-                                            onclick="rejectRental({{ $rental->id }})"
-                                            class="bg-red-500 text-white px-4 py-1 rounded-lg text-xs font-bold hover:bg-red-600 transition">
-                                        ✖ Tolak
-                                    </button>
-                                </form>
+                    <input type="file"
+                           name="payment_proof"
+                           required
+                           class="text-sm border rounded p-1">
 
-                            </div>
+                    <button class="bg-green-500 text-white px-3 py-1 rounded">
+                    ✔ Approve
+                    </button>
 
-                        @else
-                            <span class="text-slate-400 text-xs">-</span>
-                        @endif
+                    </form>
+
+                    {{-- REJECT --}}
+                    <form id="reject-{{ $rental->id }}"
+                          action="{{ route('admin.rentals.update', $rental->id) }}"
+                          method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <input type="hidden" name="status" value="cancelled">
+
+                    <button type="button"
+                            onclick="rejectRental({{ $rental->id }})"
+                            class="bg-red-500 text-white px-3 py-1 rounded">
+                    ✖ Tolak
+                    </button>
+
+                    </form>
+
+                    </div>
+
+                    @else
+
+                    <form action="{{ route('admin.rentals.reset',$rental->id) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+
+                    <button class="bg-gray-500 text-white px-4 py-1 rounded-lg text-xs font-bold hover:bg-gray-600 transition">
+                    Reset
+                    </button>
+
+                    </form>
+
+                    @endif
 
                     </td>
 
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="p-6 text-center text-slate-400">
+                    <td colspan="8" class="p-6 text-center text-slate-400">
                         Belum ada transaksi.
                     </td>
                 </tr>
@@ -169,22 +210,6 @@
 
 {{-- SWEETALERT SCRIPT --}}
 <script>
-function approveRental(id) {
-    Swal.fire({
-        title: 'Setujui pembayaran?',
-        text: "Status akan diubah menjadi Confirmed",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#16a34a',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: 'Ya, Approve'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            document.getElementById('approve-' + id).submit();
-        }
-    });
-}
-
 function rejectRental(id) {
     Swal.fire({
         title: 'Tolak transaksi?',

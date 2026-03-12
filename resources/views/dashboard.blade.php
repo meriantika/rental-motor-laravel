@@ -8,8 +8,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -63,325 +62,392 @@
     </style>
 </head>
 
+
 <body class="bg-slate-50 text-slate-900">
 
 
-    {{-- ================= NAVBAR ================= --}}
-    <nav class="bg-white border-b border-slate-100 px-8 py-5 flex justify-between items-center shadow-sm sticky top-0 z-50">
+{{-- ================= NAVBAR ================= --}}
+<nav class="bg-white border-b border-slate-100 px-8 py-5 flex justify-between items-center shadow-sm sticky top-0 z-50">
 
-        <div class="flex items-center gap-3">
-            <div class="bg-blue-600 text-white p-2 rounded-xl shadow-md">
-                ⚡
-            </div>
+    <div class="flex items-center gap-3">
+        <div class="bg-blue-600 text-white p-2 rounded-xl shadow-md">⚡</div>
+        <span class="text-xl font-bold text-blue-600 tracking-tight">MotoRent ID</span>
+    </div>
 
-            <span class="text-xl font-bold text-blue-600 tracking-tight">
-                MotoRent ID
-            </span>
-        </div>
+    <div class="flex items-center gap-8">
 
-        <div class="flex items-center gap-8">
+        {{-- MENU --}}
+        @if(Auth::user()->role == 'admin')
+            <a href="{{ route('admin.rentals.index') }}"
+               class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition">
+                Kelola Transaksi
+            </a>
+        @else
+            <a href="{{ route('rentals.index') }}"
+               class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition">
+                Riwayat Sewa
+            </a>
+        @endif
 
-            {{-- ROLE MENU --}}
-            @if(Auth::user()->role == 'admin')
-                <a href="{{ route('admin.rentals.index') }}"
-                    class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition">
-                    Kelola Transaksi
-                </a>
-            @else
-                <a href="{{ route('rentals.index') }}"
-                    class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition">
-                    Riwayat Sewa
-                </a>
-            @endif
 
-            {{-- USER INFO --}}
-            <div class="hidden md:block text-right border-l pl-6 border-slate-200">
+        {{-- USER INFO --}}
+        <div class="hidden md:block text-right border-l pl-6 border-slate-200">
 
-                <p class="text-sm font-bold">
-                    {{ Auth::user()->name }}
+            <p class="text-sm font-bold">
+                {{ Auth::user()->name }}
+            </p>
+
+            <div class="flex items-center justify-end gap-2">
+
+                <p class="text-xs text-slate-400 uppercase">
+                    {{ Auth::user()->role }}
                 </p>
 
-                <div class="flex items-center justify-end gap-2">
-
-                    <p class="text-xs text-slate-400 uppercase">
-                        {{ Auth::user()->role }}
-                    </p>
-
-                    @if(Auth::user()->role == 'admin')
-                        <span class="bg-purple-600 text-white text-[10px] px-3 py-1 rounded-full font-bold">
-                            ADMIN MODE
-                        </span>
-                    @endif
-
-                </div>
-
-            </div>
-
-            {{-- LOGOUT --}}
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button
-                    class="bg-red-50 text-red-600 px-5 py-2 rounded-2xl text-xs font-bold hover:bg-red-100 transition">
-                    Logout
-                </button>
-            </form>
-
-        </div>
-
-    </nav>
-
-
-
-    <div class="max-w-7xl mx-auto p-8">
-
-        {{-- ================= HEADER ================= --}}
-        <div class="mb-12 flex justify-between items-center">
-
-            <div>
-                <h1 class="text-4xl font-black uppercase tracking-tight">
-                    Katalog Motor
-                </h1>
-
-                <p class="text-slate-500 mt-2">
-                    Pilih armada terbaik untuk perjalanan Anda.
-                </p>
-            </div>
-
-            @if(Auth::user()->role == 'admin')
-                <a href="{{ route('motors.create') }}"
-                    class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:scale-105 transition">
-                    + Tambah Motor
-                </a>
-            @endif
-
-        </div>
-
-
-
-        {{-- ================= FILTER ================= --}}
-        <div class="bg-white p-8 rounded-3xl shadow-md border border-slate-100 mb-14">
-
-            <form action="{{ route('dashboard') }}" method="GET"
-                class="flex flex-col md:flex-row items-center gap-4">
-
-                <div class="relative flex-1 w-full">
-
-                    <input type="text"
-                        name="search"
-                        value="{{ request('search') }}"
-                        placeholder="Cari motor (contoh: NMAX, PCX)..."
-                        class="w-full bg-slate-100 rounded-2xl pl-12 pr-6 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                        🔍
+                @if(Auth::user()->role == 'admin')
+                    <span class="bg-purple-600 text-white text-[10px] px-3 py-1 rounded-full font-bold">
+                        ADMIN MODE
                     </span>
+                @endif
 
-                </div>
-
-
-                <div class="w-full md:w-56">
-
-                    <select name="brand"
-                        class="w-full bg-slate-100 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-
-                        <option value="">Semua Brand</option>
-
-                        <option value="Honda"
-                            {{ request('brand') == 'Honda' ? 'selected' : '' }}>
-                            Honda
-                        </option>
-
-                        <option value="Yamaha"
-                            {{ request('brand') == 'Yamaha' ? 'selected' : '' }}>
-                            Yamaha
-                        </option>
-
-                    </select>
-
-                </div>
+            </div>
+        </div>
 
 
-                <div class="flex gap-3 w-full md:w-auto">
+        {{-- LOGOUT --}}
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
 
-                    <button type="submit"
-                        class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-blue-600 transition shadow-md">
-                        Filter
+            <button class="bg-red-50 text-red-600 px-5 py-2 rounded-2xl text-xs font-bold hover:bg-red-100 transition">
+                Logout
+            </button>
+        </form>
+
+    </div>
+
+</nav>
+
+
+
+<div class="max-w-7xl mx-auto p-8">
+
+
+{{-- ================= HEADER ================= --}}
+<div class="mb-12 flex justify-between items-center">
+
+    <div>
+        <h1 class="text-4xl font-black uppercase tracking-tight">
+            Katalog Motor
+        </h1>
+
+        <p class="text-slate-500 mt-2">
+            Pilih armada terbaik untuk perjalanan Anda.
+        </p>
+    </div>
+
+
+    @if(Auth::user()->role == 'admin')
+        <a href="{{ route('motors.create') }}"
+           class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:scale-105 transition">
+
+            + Tambah Motor
+
+        </a>
+    @endif
+
+</div>
+
+
+
+{{-- ================= FILTER ================= --}}
+<div class="bg-white p-8 rounded-3xl shadow-md border border-slate-100 mb-14">
+
+    <form method="GET"
+          action="{{ route('dashboard') }}"
+          class="flex flex-col md:flex-row items-center gap-4">
+
+
+        {{-- SEARCH --}}
+        <div class="relative flex-1 w-full">
+
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Cari motor (contoh: NMAX, PCX)..."
+                class="w-full bg-slate-100 rounded-2xl pl-12 pr-6 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                🔍
+            </span>
+
+        </div>
+
+
+
+        {{-- BRAND --}}
+        <div class="w-full md:w-48">
+
+            <select
+                name="brand"
+                class="w-full bg-slate-100 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+
+                <option value="">Semua Brand</option>
+
+                @foreach($brands as $brand)
+
+                    <option value="{{ $brand->id }}"
+                        {{ request('brand') == $brand->id ? 'selected' : '' }}>
+
+                        {{ $brand->name }}
+
+                    </option>
+
+                @endforeach
+
+            </select>
+
+        </div>
+
+
+
+        {{-- HARGA MIN --}}
+        <div class="w-full md:w-40">
+
+            <input
+                type="number"
+                name="min_price"
+                value="{{ request('min_price') }}"
+                placeholder="Harga min"
+                class="w-full bg-slate-100 rounded-2xl px-4 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+
+        </div>
+
+
+
+        {{-- HARGA MAX --}}
+        <div class="w-full md:w-40">
+
+            <input
+                type="number"
+                name="max_price"
+                value="{{ request('max_price') }}"
+                placeholder="Harga max"
+                class="w-full bg-slate-100 rounded-2xl px-4 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+
+        </div>
+
+
+
+        {{-- BUTTON --}}
+        <div class="flex gap-3 w-full md:w-auto">
+
+            <button
+                type="submit"
+                class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-blue-600 transition shadow-md">
+
+                Filter
+
+            </button>
+
+            <a href="{{ route('dashboard') }}"
+               class="bg-slate-200 px-6 py-4 rounded-2xl font-semibold hover:bg-slate-300 transition">
+
+                Reset
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+
+{{-- ================= GRID MOTOR ================= --}}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+
+@forelse($motors as $motor)
+
+    @php
+        $rating = $motor->reviews->avg('rating');
+        $review = $motor->reviews->last();
+    @endphp
+
+    <div class="bg-white rounded-3xl border overflow-hidden shadow-sm card-hover relative">
+
+
+        {{-- ADMIN ACTION --}}
+        @if(Auth::user()->role == 'admin')
+
+            <div class="absolute top-4 right-4 flex gap-2 z-20">
+
+                <a href="{{ route('motors.edit',$motor->id) }}"
+                   class="bg-white p-2 rounded-xl shadow-md hover:bg-yellow-400 hover:text-white transition">
+                    ✏
+                </a>
+
+                <form id="delete-form-{{ $motor->id }}"
+                      action="{{ route('motors.destroy',$motor->id) }}"
+                      method="POST">
+
+                    @csrf
+                    @method('DELETE')
+
+                    <button
+                        type="button"
+                        onclick="confirmDelete({{ $motor->id }})"
+                        class="bg-white p-2 rounded-xl shadow-md hover:bg-red-500 hover:text-white transition">
+                        🗑
                     </button>
 
-                    <a href="{{ route('dashboard') }}"
-                        class="bg-slate-200 px-6 py-4 rounded-2xl font-semibold hover:bg-slate-300 transition">
-                        Reset
-                    </a>
+                </form>
 
-                </div>
+            </div>
 
-            </form>
-
-        </div>
+        @endif
 
 
+        {{-- IMAGE --}}
+        <div class="h-60 bg-slate-100 flex items-center justify-center">
 
-        {{-- ================= GRID ================= --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            @if($motor->image_url)
 
-            @forelse($motors as $motor)
+                <img
+                    src="{{ $motor->image_url }}"
+                    class="h-full object-contain p-6">
 
-                @php
-                    $rating = $motor->reviews->avg('rating');
-                    $review = $motor->reviews->last();
-                @endphp
+            @else
 
+                <span class="text-slate-300 text-5xl font-bold">
+                    {{ $motor->brand->name ?? '' }}
+                </span>
 
-                <div class="bg-white rounded-3xl border overflow-hidden shadow-sm card-hover relative">
-
-
-                    {{-- ADMIN ACTION --}}
-                    @if(Auth::user()->role == 'admin')
-
-                        <div class="absolute top-4 right-4 flex gap-2 z-20">
-
-                            <a href="{{ route('motors.edit', $motor->id) }}"
-                                class="bg-white p-2 rounded-xl shadow-md hover:bg-yellow-400 hover:text-white transition">
-                                ✏
-                            </a>
-
-                            <form id="delete-form-{{ $motor->id }}"
-                                action="{{ route('motors.destroy', $motor->id) }}"
-                                method="POST">
-
-                                @csrf
-                                @method('DELETE')
-
-                                <button type="button"
-                                    onclick="confirmDelete({{ $motor->id }})"
-                                    class="bg-white p-2 rounded-xl shadow-md hover:bg-red-500 hover:text-white transition">
-                                    🗑
-                                </button>
-
-                            </form>
-
-                        </div>
-
-                    @endif
-
-
-
-                    {{-- MOTOR IMAGE --}}
-                    <div class="h-60 bg-slate-100 flex items-center justify-center">
-
-                        @if($motor->image_url)
-
-                            <img src="{{ $motor->image_url }}"
-                                class="h-full object-contain p-6">
-
-                        @else
-
-                            <span class="text-slate-300 text-5xl font-bold">
-                                {{ $motor->brand }}
-                            </span>
-
-                        @endif
-
-                    </div>
-
-
-
-                    {{-- MOTOR INFO --}}
-                    <div class="p-8">
-
-                        <h3 class="text-xl font-bold mb-1">
-                            {{ $motor->name }}
-                        </h3>
-
-                        <p class="text-sm text-slate-500 mb-1">
-                            {{ $motor->cc }} CC
-                        </p>
-
-
-                        {{-- RATING --}}
-                        @if($rating)
-                            <p class="text-yellow-500 font-semibold text-sm">
-                                ⭐ {{ number_format($rating,1) }} / 5
-                                <span class="text-slate-400 text-xs">
-                                    ({{ $motor->reviews->count() }} ulasan)
-                                </span>
-                            </p>
-                        @endif
-
-
-                        {{-- COMMENT --}}
-                        @if($review && $review->comment)
-                            <p class="text-xs text-slate-500 italic mt-1">
-                                "{{ $review->comment }}"
-                            </p>
-                        @endif
-
-
-                        <p class="text-2xl font-black mt-3 mb-5">
-                            Rp {{ number_format($motor->price_per_day,0,',','.') }}
-                        </p>
-
-
-
-                        {{-- USER BOOKING --}}
-                        @if(Auth::user()->role == 'user')
-
-                            <form action="{{ route('sewa.store',$motor->id) }}"
-                                method="POST"
-                                class="space-y-3">
-
-                                @csrf
-
-                                <input type="date"
-                                    name="start_date"
-                                    required
-                                    min="{{ date('Y-m-d') }}"
-                                    class="w-full bg-slate-100 rounded-xl px-3 py-2 text-sm">
-
-                                <input type="date"
-                                    name="end_date"
-                                    required
-                                    min="{{ date('Y-m-d') }}"
-                                    class="w-full bg-slate-100 rounded-xl px-3 py-2 text-sm">
-
-                                <button
-                                    class="w-full bg-slate-900 text-white py-3 rounded-2xl font-bold hover:bg-blue-600 transition">
-                                    Sewa Sekarang
-                                </button>
-
-                            </form>
-
-                        @endif
-
-                    </div>
-
-                </div>
-
-            @empty
-
-                <div class="col-span-full text-center py-20">
-                    <p class="text-slate-400 font-bold">
-                        Tidak ada motor ditemukan.
-                    </p>
-                </div>
-
-            @endforelse
+            @endif
 
         </div>
 
 
 
-        {{-- ================= PAGINATION ================= --}}
-        <div class="dashboard-pagination">
-            {{ $motors->withQueryString()->links('pagination.dashboard') }}
+        {{-- MOTOR INFO --}}
+        <div class="p-8">
+
+            <h3 class="text-xl font-bold mb-1">
+                {{ $motor->name }}
+            </h3>
+
+            <p class="text-sm text-slate-500 mb-1">
+                {{ $motor->cc }} CC
+            </p>
+
+
+            @if($rating)
+
+                <p class="text-yellow-500 font-semibold text-sm">
+                    ⭐ {{ number_format($rating,1) }} / 5
+                    <span class="text-slate-400 text-xs">
+                        ({{ $motor->reviews->count() }} ulasan)
+                    </span>
+                </p>
+
+            @endif
+
+
+            @if($review && $review->comment)
+
+                <p class="text-xs text-slate-500 italic mt-1">
+                    "{{ $review->comment }}"
+                </p>
+
+            @endif
+
+
+
+            <p class="text-2xl font-black mt-3 mb-5">
+                Rp {{ number_format($motor->price_per_day,0,',','.') }}
+            </p>
+
+
+            <a href="{{ route('motor.detail',$motor->id) }}"
+               class="block text-center bg-blue-100 text-blue-600 py-2 rounded-xl font-semibold mb-3 hover:bg-blue-200">
+
+                Lihat Detail
+
+            </a>
+
+
+            {{-- BOOKING --}}
+            @if(Auth::user()->role == 'user')
+
+                <form
+                    action="{{ route('sewa.store',$motor->id) }}"
+                    method="POST"
+                    class="space-y-3">
+
+                    @csrf
+
+                    <input
+                        type="date"
+                        name="start_date"
+                        required
+                        min="{{ date('Y-m-d') }}"
+                        class="w-full bg-slate-100 rounded-xl px-3 py-2 text-sm">
+
+
+                    <input
+                        type="date"
+                        name="end_date"
+                        required
+                        min="{{ date('Y-m-d') }}"
+                        class="w-full bg-slate-100 rounded-xl px-3 py-2 text-sm">
+
+
+                    <button
+                        class="w-full bg-slate-900 text-white py-3 rounded-2xl font-bold hover:bg-blue-600 transition">
+
+                        Sewa Sekarang
+
+                    </button>
+
+                </form>
+
+            @endif
+
         </div>
 
     </div>
 
+@empty
+
+<div class="col-span-full text-center py-20">
+
+    <p class="text-slate-400 font-bold">
+        Tidak ada motor ditemukan.
+    </p>
+
+</div>
+
+@endforelse
+
+</div>
+
+
+
+{{-- ================= PAGINATION ================= --}}
+<div class="dashboard-pagination">
+
+{{ $motors->withQueryString()->links('pagination.dashboard') }}
+
+</div>
+
+</div>
+
 
 
 <script>
+
 function confirmDelete(id){
+
 Swal.fire({
 title:'Hapus Motor?',
 text:"Data yang dihapus tidak bisa dikembalikan.",
@@ -392,11 +458,15 @@ cancelButtonColor:'#6b7280',
 confirmButtonText:'Ya, Hapus',
 cancelButtonText:'Batal'
 }).then((result)=>{
+
 if(result.isConfirmed){
 document.getElementById('delete-form-'+id).submit();
 }
+
 });
+
 }
+
 </script>
 
 </body>

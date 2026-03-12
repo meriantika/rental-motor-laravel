@@ -44,8 +44,20 @@ class Motor extends Model
         'cc' => 'integer',
         'rating' => 'decimal:1',
     ];
+
+    /**
+     * Relasi dengan tabel reviews
+     */
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Relasi dengan tabel brands
+     */
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
     }
 }

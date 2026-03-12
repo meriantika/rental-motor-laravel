@@ -71,14 +71,19 @@
                     </label>
 
                     <div class="relative mt-2">
-                        <select name="brand"
-                            class="w-full bg-slate-50 border rounded-2xl px-6 py-4
+
+                        <select name="brand_id"
+                            class="w-full bg-slate-100 border rounded-2xl px-6 py-4 text-sm
                                    focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
                                    font-bold appearance-none cursor-pointer pr-12">
 
                             <option value="">Pilih Brand</option>
-                            <option value="Honda">Honda</option>
-                            <option value="Yamaha">Yamaha</option>
+
+                            @foreach($brands as $brand)
+                                <option value="{{ $brand->id }}">
+                                    {{ $brand->name }}
+                                </option>
+                            @endforeach
 
                         </select>
 
@@ -95,6 +100,7 @@
                                       d="M19 9l-7 7-7-7" />
                             </svg>
                         </div>
+
                     </div>
                 </div>
 
@@ -131,7 +137,6 @@
 
                         </select>
 
-                        <!-- Arrow -->
                         <div class="pointer-events-none absolute inset-y-0 right-5 flex items-center text-slate-400">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                  class="h-5 w-5"

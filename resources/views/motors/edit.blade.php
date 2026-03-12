@@ -80,24 +80,27 @@
                                   font-bold">
                 </div>
 
-                <!-- BRAND PARTNER -->
+                <!-- BRAND -->
                 <div>
                     <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">
                         Brand Partner
                     </label>
 
                     <div class="relative mt-2">
-                        <select name="brand"
-                            class="w-full bg-slate-50 border rounded-2xl px-6 py-4
+
+                        <select name="brand_id"
+                            class="w-full bg-slate-100 rounded-2xl px-6 py-4 text-sm
                                    focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
                                    font-bold appearance-none cursor-pointer pr-12">
 
-                            <option value="Honda" {{ $motor->brand=='Honda'?'selected':'' }}>
-                                Honda
-                            </option>
-                            <option value="Yamaha" {{ $motor->brand=='Yamaha'?'selected':'' }}>
-                                Yamaha
-                            </option>
+                            <option value="">Pilih Brand</option>
+
+                            @foreach($brands as $brand)
+                                <option value="{{ $brand->id }}"
+                                    {{ $motor->brand_id == $brand->id ? 'selected' : '' }}>
+                                    {{ $brand->name }}
+                                </option>
+                            @endforeach
 
                         </select>
 
@@ -114,10 +117,11 @@
                                       d="M19 9l-7 7-7-7" />
                             </svg>
                         </div>
+
                     </div>
                 </div>
 
-                <!-- KATEGORI TIPE -->
+                <!-- TIPE -->
                 <div>
                     <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">
                         Kategori Tipe
@@ -141,7 +145,6 @@
 
                         </select>
 
-                        <!-- Arrow -->
                         <div class="pointer-events-none absolute inset-y-0 right-5 flex items-center text-slate-400">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                  class="h-5 w-5"
