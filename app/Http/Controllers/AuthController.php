@@ -38,11 +38,11 @@ class AuthController extends Controller
                 return redirect()->route('dashboard')->with('success', 'Selamat datang kembali, Admin!');
             }
 
-            // Jika User biasa, diarahkan ke katalog agar tidak 404
+            // Jika User biasa
             return redirect()->intended('/dashboard')->with('success', 'Selamat datang di MotoRent ID!');
         }
 
-        // 3. Jika gagal login, kirim pesan error session
+        // 3. Jika gagal login
         return back()->with('error', 'Email atau password salah.')->withInput($request->only('email'));
     }
 
@@ -55,35 +55,60 @@ class AuthController extends Controller
     }
 
     /**
-     * Proses Pendaftaran Akun Baru (Handle Register)
+     * Proses Pendaftaran Akun Baru
      */
     public function register(Request $request)
     {
-        // 1. Validasi Input
+        // Validasi
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'required',
-            'password' => 'required|string|min:6|confirmed', 
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
-        // 2. Simpan ke Database dengan role default 'user'
+        // Simpan user
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => bcrypt($request->password),
-            'role' => 'user', 
+            'role' => 'user',
         ]);
 
-        // 3. Redirect ke halaman login dengan mengirim SESSION SUKSES
-        // Pesan ini akan ditangkap oleh komponen alert di view login
-        return redirect()->route('login')->with('success', 'Akun berhasil dibuat! Silakan login untuk mulai menyewa.');
+        return redirect()->route('login')
+            ->with('success', 'Akun berhasil dibuat! Silakan login untuk mulai menyewa.');
     }
+
+
+    /**
+     * Menyimpan Data Profil Penyewa
+     */
+    public function saveProfile(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'phone' => 'required',
+            'nik' => 'required',
+            'address' => 'required'
+        ]);
+
+        $user = Auth::user();
+
+        $user->update([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'nik' => $request->nik,
+            'address' => $request->address
+        ]);
+
+        return redirect()->route('dashboard')
+            ->with('success','Data penyewa berhasil disimpan');
+    }
+
 
     /**
      * Proses Logout
-     * Menghapus session secara menyeluruh demi keamanan.
      */
     public function logout(Request $request)
     {

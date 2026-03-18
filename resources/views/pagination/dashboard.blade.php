@@ -1,61 +1,82 @@
 @if ($paginator->hasPages())
-<div class="dashboard-pagination">
 
-    {{-- PREVIOUS --}}
-    @if ($paginator->onFirstPage())
-        <span class="page-btn disabled">
-            ‹
-        </span>
-    @else
-        <a href="{{ $paginator->previousPageUrl() }}" 
-           class="page-btn hover-scale"
-           aria-label="Previous">
-            ‹
-        </a>
-    @endif
+<div class="mt-12 flex justify-center">
 
+<nav class="flex items-center gap-2 text-sm font-semibold">
 
-    {{-- PAGE NUMBERS --}}
-    @foreach ($elements as $element)
+{{-- Previous --}}
+@if ($paginator->onFirstPage())
 
-        {{-- DOTS --}}
-        @if (is_string($element))
-            <span class="page-dots">...</span>
-        @endif
+<span class="px-4 py-2 text-gray-400 bg-gray-100 rounded-xl">
+Previous
+</span>
 
-        {{-- NUMBER LINKS --}}
-        @if (is_array($element))
-            @foreach ($element as $page => $url)
+@else
 
-                @if ($page == $paginator->currentPage())
-                    <span class="page-btn active">
-                        {{ $page }}
-                    </span>
-                @else
-                    <a href="{{ $url }}" 
-                       class="page-btn hover-scale">
-                        {{ $page }}
-                    </a>
-                @endif
+<a href="{{ $paginator->previousPageUrl() }}"
+class="px-4 py-2 bg-white border rounded-xl hover:bg-blue-50 hover:border-blue-300 transition">
+Previous
+</a>
 
-            @endforeach
-        @endif
-
-    @endforeach
+@endif
 
 
-    {{-- NEXT --}}
-    @if ($paginator->hasMorePages())
-        <a href="{{ $paginator->nextPageUrl() }}" 
-           class="page-btn hover-scale"
-           aria-label="Next">
-            ›
-        </a>
-    @else
-        <span class="page-btn disabled">
-            ›
-        </span>
-    @endif
+{{-- Page Numbers --}}
+@foreach ($elements as $element)
+
+@if (is_string($element))
+
+<span class="px-3 py-2 text-gray-400">
+{{ $element }}
+</span>
+
+@endif
+
+
+@if (is_array($element))
+
+@foreach ($element as $page => $url)
+
+@if ($page == $paginator->currentPage())
+
+<span class="px-4 py-2 text-white bg-blue-600 rounded-xl shadow">
+{{ $page }}
+</span>
+
+@else
+
+<a href="{{ $url }}"
+class="px-4 py-2 bg-white border rounded-xl hover:bg-blue-50 hover:border-blue-300 transition">
+{{ $page }}
+</a>
+
+@endif
+
+@endforeach
+
+@endif
+
+@endforeach
+
+
+{{-- Next --}}
+@if ($paginator->hasMorePages())
+
+<a href="{{ $paginator->nextPageUrl() }}"
+class="px-4 py-2 bg-white border rounded-xl hover:bg-blue-50 hover:border-blue-300 transition">
+Next
+</a>
+
+@else
+
+<span class="px-4 py-2 text-gray-400 bg-gray-100 rounded-xl">
+Next
+</span>
+
+@endif
+
+</nav>
 
 </div>
+
 @endif

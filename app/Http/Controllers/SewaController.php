@@ -194,7 +194,18 @@ class SewaController extends Controller
     {
         $rental = Rental::findOrFail($id);
 
-        if($request->hasFile('payment_proof')){
+        // Jika status CANCELLED → hapus bukti pembayaran
+        if ($request->status == 'cancelled') {
+
+            if ($rental->payment_proof && file_exists(public_path('payment_proofs/'.$rental->payment_proof))) {
+                unlink(public_path('payment_proofs/'.$rental->payment_proof));
+            }
+
+            $rental->payment_proof = null;
+        }
+
+        // Jika upload bukti baru
+        if ($request->hasFile('payment_proof')) {
 
             $file = $request->file('payment_proof');
 
@@ -209,7 +220,7 @@ class SewaController extends Controller
 
         $rental->save();
 
-        return back()->with('success','Transaksi berhasil diverifikasi');
+        return back()->with('success','Status transaksi berhasil diperbarui');
     }
 
     /*

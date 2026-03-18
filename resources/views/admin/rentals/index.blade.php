@@ -5,7 +5,6 @@
     <title>Kelola Transaksi - MotoRent</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="bg-slate-50">
@@ -58,7 +57,7 @@
                     <th class="p-4">Total</th>
                     <th class="p-4">Bukti</th>
                     <th class="p-4">Status</th>
-                    <th class="p-4 text-center">Aksi</th>
+                    <th class="p-4 text-center">Update Status</th>
                 </tr>
             </thead>
 
@@ -74,14 +73,12 @@
                         {{ $rental->motor->name }}
                     </td>
 
-                    {{-- TANGGAL SEWA --}}
                     <td class="p-4">
                         {{ \Carbon\Carbon::parse($rental->start_date)->format('d M Y') }}
                         -
                         {{ \Carbon\Carbon::parse($rental->end_date)->format('d M Y') }}
                     </td>
 
-                    {{-- TANGGAL TRANSAKSI --}}
                     <td class="p-4 text-slate-600">
                         {{ \Carbon\Carbon::parse($rental->created_at)->format('d M Y') }}
                     </td>
@@ -126,66 +123,46 @@
                         @endif
                     </td>
 
-                    {{-- AKSI --}}
+                    {{-- UPDATE STATUS --}}
                     <td class="p-4 text-center">
 
-                    @if($rental->status == 'waiting_verification')
-
-                    <div class="flex justify-center gap-2 items-center">
-
-                    {{-- APPROVE + UPLOAD BUKTI --}}
-                    <form action="{{ route('admin.rentals.update',$rental->id) }}"
-                          method="POST"
-                          enctype="multipart/form-data"
-                          class="flex items-center gap-2">
-
+                    <form action="{{ route('admin.rentals.update',$rental->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PATCH')
 
-                    <input type="hidden" name="status" value="confirmed">
+                    <div class="flex justify-center items-center gap-2">
+
+                    <select name="status" class="border rounded-lg px-3 py-2">
+
+                    <option value="pending" {{ $rental->status=='pending'?'selected':'' }}>
+                    Pending
+                    </option>
+
+                    <option value="waiting_verification" {{ $rental->status=='waiting_verification'?'selected':'' }}>
+                    Waiting Verification
+                    </option>
+
+                    <option value="confirmed" {{ $rental->status=='confirmed'?'selected':'' }}>
+                    Confirmed
+                    </option>
+
+                    <option value="cancelled" {{ $rental->status=='cancelled'?'selected':'' }}>
+                    Cancelled
+                    </option>
+
+                    </select>
 
                     <input type="file"
-                           name="payment_proof"
-                           required
-                           class="text-sm border rounded p-1">
+                    name="payment_proof"
+                    class="text-sm border rounded p-1">
 
-                    <button class="bg-green-500 text-white px-3 py-1 rounded">
-                    ✔ Approve
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                    Update
                     </button>
-
-                    </form>
-
-                    {{-- REJECT --}}
-                    <form id="reject-{{ $rental->id }}"
-                          action="{{ route('admin.rentals.update', $rental->id) }}"
-                          method="POST">
-                    @csrf
-                    @method('PATCH')
-                    <input type="hidden" name="status" value="cancelled">
-
-                    <button type="button"
-                            onclick="rejectRental({{ $rental->id }})"
-                            class="bg-red-500 text-white px-3 py-1 rounded">
-                    ✖ Tolak
-                    </button>
-
-                    </form>
 
                     </div>
 
-                    @else
-
-                    <form action="{{ route('admin.rentals.reset',$rental->id) }}" method="POST">
-                    @csrf
-                    @method('PATCH')
-
-                    <button class="bg-gray-500 text-white px-4 py-1 rounded-lg text-xs font-bold hover:bg-gray-600 transition">
-                    Reset
-                    </button>
-
                     </form>
-
-                    @endif
 
                     </td>
 
@@ -207,25 +184,6 @@
     </div>
 
 </div>
-
-{{-- SWEETALERT SCRIPT --}}
-<script>
-function rejectRental(id) {
-    Swal.fire({
-        title: 'Tolak transaksi?',
-        text: "Status akan diubah menjadi Cancelled",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: 'Ya, Tolak'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            document.getElementById('reject-' + id).submit();
-        }
-    });
-}
-</script>
 
 </body>
 </html>

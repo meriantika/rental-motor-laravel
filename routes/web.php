@@ -75,6 +75,17 @@ Route::middleware(['auth'])->group(function () {
     })->name('profile');
 
 
+    // ROUTE EDIT PROFIL USER
+    Route::get('/profile/edit', function () {
+        return view('profile');
+    })->name('profile.edit');
+
+
+    // SIMPAN PROFIL VIA CONTROLLER
+    Route::post('/profile/save', [AuthController::class, 'saveProfile'])
+        ->name('profile.save');
+
+
     Route::post('/profile', function (\Illuminate\Http\Request $request) {
 
         $user = auth()->user();
@@ -177,15 +188,30 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('motors', MotorController::class)
             ->except(['index', 'show']);
 
+
         Route::get('/admin/rentals', [SewaController::class, 'adminIndex'])
             ->name('admin.rentals.index');
 
         Route::patch('/admin/rentals/{id}', [SewaController::class, 'updateStatus'])
             ->name('admin.rentals.update');
 
-        // RESET STATUS KE WAITING
         Route::patch('/admin/rentals/{id}/reset', [SewaController::class, 'resetStatus'])
             ->name('admin.rentals.reset');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DATA USER (ADMIN)
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/admin/users', function () {
+
+            $users = \App\Models\User::latest()->paginate(10);
+
+            return view('admin.users.index', compact('users'));
+
+        })->name('admin.users.index');
 
 
         /*

@@ -141,38 +141,40 @@
             Ulasan Pengguna
         </h2>
 
-        <div class="space-y-6">
+        @forelse($reviews as $review)
 
-            @forelse($motor->reviews as $review)
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-6">
 
-                <div class="bg-white p-6 rounded-2xl shadow">
+            <div class="flex justify-between items-center mb-2">
 
-                    <div class="flex justify-between mb-2">
+                <h4 class="font-semibold">
+                    {{ $review->user->name }}
+                </h4>
 
-                        <span class="font-bold">
-                            {{ $review->user->name }}
-                        </span>
-
-                        <span class="text-yellow-500">
-                            ⭐ {{ $review->rating }}/5
-                        </span>
-
-                    </div>
-
-                    <p class="text-slate-600">
-                        {{ $review->comment }}
-                    </p>
-
+                <div class="text-yellow-500 font-semibold">
+                    ⭐ {{ $review->rating }}/5
                 </div>
 
-            @empty
+            </div>
 
-                <p class="text-slate-400">
-                    Belum ada ulasan untuk motor ini.
-                </p>
+            <p class="text-slate-600">
+                {{ $review->comment }}
+            </p>
 
-            @endforelse
+        </div>
 
+        @empty
+
+        <p class="text-slate-400">
+            Belum ada ulasan
+        </p>
+
+        @endforelse
+
+
+        {{-- PAGINATION REVIEW --}}
+        <div class="mt-8 flex justify-center">
+            {{ $reviews->links('pagination.dashboard') }}
         </div>
 
     </div>

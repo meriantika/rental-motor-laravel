@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Motor;
 use App\Models\Brand;
+use App\Models\Review;
 use Illuminate\Http\Request;
 
 class MotorController extends Controller
@@ -23,7 +24,6 @@ class MotorController extends Controller
     public function katalog()
     {
         $motors = Motor::with('brand')->get(); 
-        
         return view('katalog', compact('motors'));
     }
 
@@ -35,23 +35,18 @@ class MotorController extends Controller
         $brands = Brand::all();
 
         $motors = Motor::with('brand')
-
-            ->when($request->search, function ($q, $search) {
-                $q->where('name','like',"%{$search}%");
+            ->when($request->search, function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%');
             })
-
-            ->when($request->brand, function ($q, $brand) {
-                $q->where('brand_id',$brand);
+            ->when($request->brand, function ($q) use ($request) {
+                $q->where('brand_id', $request->brand);
             })
-
-            ->when($request->min_price, function ($q, $min) {
-                $q->where('price_per_day','>=',$min);
+            ->when($request->min_price, function ($q) use ($request) {
+                $q->where('price_per_day', '>=', $request->min_price);
             })
-
-            ->when($request->max_price, function ($q, $max) {
-                $q->where('price_per_day','<=',$max);
+            ->when($request->max_price, function ($q) use ($request) {
+                $q->where('price_per_day', '<=', $request->max_price);
             })
-
             ->latest()
             ->paginate(3)
             ->withQueryString();
@@ -64,9 +59,14 @@ class MotorController extends Controller
      */
     public function show($id)
     {
-        $motor = Motor::with('reviews.user','brand')->findOrFail($id);
+    $motor = Motor::findOrFail($id);
 
-        return view('motors.show', compact('motor'));
+    $reviews = Review::where('motor_id', $id)
+        ->with('user')
+        ->latest()
+        ->paginate(5); // tampil 5 ulasan per halaman
+
+    return view('motors.show', compact('motor','reviews'));
     }
 
     /**
