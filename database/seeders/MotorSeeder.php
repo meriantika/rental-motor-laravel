@@ -42,6 +42,16 @@ class MotorSeeder extends Seeder
         Motor::create([
             'name' => 'Yamaha Aerox',
             'brand_id' => 2,
+            'cc' => 125,
+            'type' => 'Matic',
+            'price_per_day' => 75000,
+            'image_url' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQme8RT0Pqz7SebyLjgTHaDLBP3v92toZUpVQ&s',
+            'is_available' => true
+        ]);
+
+        Motor::create([
+            'name' => 'Yamaha Mio M3',
+            'brand_id' => 2,
             'cc' => 155,
             'type' => 'Matic',
             'price_per_day' => 120000,
