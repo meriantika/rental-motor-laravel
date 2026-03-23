@@ -59,8 +59,6 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        dd($request->all());
-        
         // Validasi
         $request->validate([
             'name' => 'required|string|max:255',
