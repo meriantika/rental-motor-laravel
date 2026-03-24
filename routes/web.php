@@ -23,6 +23,16 @@ Route::get('/test-db', function () {
     }
 });
 
+/*
+|--------------------------------------------------------------------------
+| TEST USERS (LIHAT DATA USER DARI RAILWAY)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/test-users', function () {
+    return DB::table('users')->get();
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -70,7 +80,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 
-
     /*
     |--------------------------------------------------------------------------
     | DASHBOARD
@@ -79,7 +88,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [MotorController::class, 'index'])
         ->name('dashboard');
-
 
     /*
     |--------------------------------------------------------------------------
@@ -97,7 +105,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/profile/save', [AuthController::class, 'saveProfile'])
         ->name('profile.save');
-
 
     Route::post('/profile', function (\Illuminate\Http\Request $request) {
 
