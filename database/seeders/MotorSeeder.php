@@ -88,5 +88,15 @@ class MotorSeeder extends Seeder
             'image_url' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0Kp6VLPzz7__fB-Gbul9AFLdTrHN1Mr3U4Q&s',
             'is_available' => true
         ]);
+
+        Motor::create([
+            'name' => 'Honda Beat Deluxe',
+            'brand_id' => 1,
+            'cc' => 110,
+            'type' => 'Matic',
+            'price_per_day' => 95000,
+            'image_url' => 'https://portalmadura.com/wp-content/uploads/2023/08/Honda-Beat-Deluxe-2023_-Skutik-Irit-dengan-Fitur-Canggih.webp',
+            'is_available' => true
+        ]);
     }
 }
