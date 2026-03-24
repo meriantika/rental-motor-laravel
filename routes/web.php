@@ -1,11 +1,28 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB; // ✅ TAMBAHAN
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MotorController;
 use App\Http\Controllers\SewaController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\BrandController;
+
+/*
+|--------------------------------------------------------------------------
+| TEST DATABASE CONNECTION
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/test-db', function () {
+    try {
+        DB::connection()->getPdo();
+        return "✅ Database CONNECTED";
+    } catch (\Exception $e) {
+        return "❌ Database NOT CONNECTED: " . $e->getMessage();
+    }
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -74,14 +91,10 @@ Route::middleware(['auth'])->group(function () {
         return view('profile');
     })->name('profile');
 
-
-    // ROUTE EDIT PROFIL USER
     Route::get('/profile/edit', function () {
         return view('profile');
     })->name('profile.edit');
 
-
-    // SIMPAN PROFIL VIA CONTROLLER
     Route::post('/profile/save', [AuthController::class, 'saveProfile'])
         ->name('profile.save');
 
@@ -188,7 +201,6 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('motors', MotorController::class)
             ->except(['index', 'show']);
 
-
         Route::get('/admin/rentals', [SewaController::class, 'adminIndex'])
             ->name('admin.rentals.index');
 
@@ -198,27 +210,10 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/admin/rentals/{id}/reset', [SewaController::class, 'resetStatus'])
             ->name('admin.rentals.reset');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | DATA USER (ADMIN)
-        |--------------------------------------------------------------------------
-        */
-
         Route::get('/admin/users', function () {
-
             $users = \App\Models\User::latest()->paginate(10);
-
             return view('admin.users.index', compact('users'));
-
         })->name('admin.users.index');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | KELOLA BRAND
-        |--------------------------------------------------------------------------
-        */
 
         Route::get('/admin/brands', [BrandController::class,'index'])
             ->name('brands.index');
