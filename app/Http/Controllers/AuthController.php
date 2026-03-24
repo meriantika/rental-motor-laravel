@@ -33,13 +33,16 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
+            // Cek role user untuk menentukan arah redirect
             if (Auth::user()->role === 'admin') {
                 return redirect()->route('dashboard')->with('success', 'Selamat datang kembali, Admin!');
             }
 
+            // Jika User biasa
             return redirect()->intended('/dashboard')->with('success', 'Selamat datang di MotoRent ID!');
         }
 
+        // 3. Jika gagal login
         return back()->with('error', 'Email atau password salah.')->withInput($request->only('email'));
     }
 
@@ -56,9 +59,6 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        // ✅ DEBUG
-        dd('MASUK REGISTER', $request->all());
-
         // Validasi
         $request->validate([
             'name' => 'required|string|max:255',
@@ -79,6 +79,7 @@ class AuthController extends Controller
         return redirect()->route('login')
             ->with('success', 'Akun berhasil dibuat! Silakan login untuk mulai menyewa.');
     }
+
 
     /**
      * Menyimpan Data Profil Penyewa
@@ -104,6 +105,7 @@ class AuthController extends Controller
         return redirect()->route('dashboard')
             ->with('success','Data penyewa berhasil disimpan');
     }
+
 
     /**
      * Proses Logout
