@@ -30,7 +30,7 @@ class MotorSeeder extends Seeder
         ]);
 
         Motor::create([
-            'name' => 'Honda Scoopy',
+            'name' => 'Honda Scoopy Prestige',
             'brand_id' => 1,
             'cc' => 110,
             'type' => 'Matic',
@@ -56,6 +56,36 @@ class MotorSeeder extends Seeder
             'type' => 'Matic',
             'price_per_day' => 80000,
             'image_url' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQme8RT0Pqz7SebyLjgTHaDLBP3v92toZUpVQ&s',
+            'is_available' => true
+        ]);
+
+        Motor::create([
+            'name' => 'Honda Vario 160',
+            'brand_id' => 1,
+            'cc' => 160,
+            'type' => 'Matic',
+            'price_per_day' => 150000,
+            'image_url' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKEFP8JpWmv8BTsDwKfpZF9cK0NF5bUcBWdA&s',
+            'is_available' => true
+        ]);
+
+        Motor::create([
+            'name' => 'Honda Genio CBS-ISS',
+            'brand_id' => 1,
+            'cc' => 110,
+            'type' => 'Matic',
+            'price_per_day' => 115000,
+            'image_url' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRsbR2aiZTi2jXWTMQJskDMI1M2LDYewz5CJg&s',
+            'is_available' => true
+        ]);
+
+        Motor::create([
+            'name' => 'Yamaha Grand Filano',
+            'brand_id' => 2,
+            'cc' => 125,
+            'type' => 'Matic',
+            'price_per_day' => 125000,
+            'image_url' => 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0Kp6VLPzz7__fB-Gbul9AFLdTrHN1Mr3U4Q&s',
             'is_available' => true
         ]);
     }
