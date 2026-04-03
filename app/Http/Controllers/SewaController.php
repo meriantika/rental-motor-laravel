@@ -187,12 +187,16 @@ class SewaController extends Controller
         $totalTransaksi = Rental::count();
         $totalPending = Rental::where('status', 'waiting_verification')->count();
         $totalPendapatan = Rental::where('status', 'confirmed')->sum('total_price');
+        $totalConfirmed = Rental::where('status', 'confirmed')->count();
+        $totalCancelled = Rental::where('status', 'cancelled')->count();
 
         return view('admin.rentals.index', compact(
             'rentals',
             'totalTransaksi',
             'totalPending',
-            'totalPendapatan'
+            'totalPendapatan',
+            'totalConfirmed',
+            'totalCancelled'
         ));
     }
 

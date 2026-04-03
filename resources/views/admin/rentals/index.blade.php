@@ -21,7 +21,7 @@
     </div>
 
     {{-- ================= STATISTIK ================= --}}
-    <div class="grid md:grid-cols-3 gap-6 mb-10">
+    <div class="grid md:grid-cols-5 gap-6 mb-10">
 
         <div class="bg-white p-6 rounded-2xl shadow">
             <p class="text-slate-400 text-sm">Total Transaksi</p>
@@ -39,6 +39,20 @@
             <p class="text-slate-400 text-sm">Total Pendapatan</p>
             <h2 class="text-2xl font-bold mt-2 text-green-600">
                 Rp {{ number_format($totalPendapatan,0,',','.') }}
+            </h2>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow">
+            <p class="text-slate-400 text-sm">Confirmed</p>
+            <h2 class="text-2xl font-bold mt-2 text-blue-600">
+                {{ $totalConfirmed }}
+            </h2>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow">
+            <p class="text-slate-400 text-sm">Cancelled</p>
+            <h2 class="text-2xl font-bold mt-2 text-red-600">
+                {{ $totalCancelled }}
             </h2>
         </div>
 
