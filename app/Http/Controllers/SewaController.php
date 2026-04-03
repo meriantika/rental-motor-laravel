@@ -39,6 +39,14 @@ class SewaController extends Controller
         $request->validate([
             'start_date' => 'required|date|after_or_equal:today',
             'end_date'   => 'required|date|after:start_date',
+        ], [
+            'start_date.required' => 'Tanggal mulai wajib diisi.',
+            'start_date.date' => 'Format tanggal mulai tidak valid.',
+            'start_date.after_or_equal' => 'Tanggal mulai tidak boleh sebelum hari ini.',
+
+            'end_date.required' => 'Tanggal selesai wajib diisi.',
+            'end_date.date' => 'Format tanggal selesai tidak valid.',
+            'end_date.after' => 'Tanggal selesai tidak boleh lebih kecil atau sama dengan tanggal mulai.',
         ]);
 
         $motor = Motor::findOrFail($id);

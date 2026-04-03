@@ -183,6 +183,17 @@
 </div>
 
 
+<!-- ================= ERROR NOTIF ================= -->
+@if ($errors->any())
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl">
+        <ul class="list-disc list-inside text-sm space-y-1">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <!-- ================= GRID MOTOR ================= -->
 <div class="grid md:grid-cols-3 gap-8">
 

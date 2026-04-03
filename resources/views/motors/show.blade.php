@@ -53,7 +53,7 @@
             </h1>
 
             <p class="text-slate-500 mb-3">
-                {{ $motor->cc }} CC • {{ $motor->brand }}
+                {{ $motor->cc }} CC • {{ $motor->brand->name }}
             </p>
 
 
