@@ -44,6 +44,58 @@
 
     </div>
 
+    {{-- ================= FILTER ================= --}}
+    <div class="bg-white p-6 rounded-2xl shadow mb-8">
+        <form method="GET" action="{{ route('admin.rentals.index') }}"
+              class="grid md:grid-cols-4 gap-4 items-end">
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                    Tanggal Transaksi
+                </label>
+                <input type="date"
+                       name="transaction_date"
+                       value="{{ request('transaction_date') }}"
+                       class="w-full border rounded-xl px-4 py-3">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                    Status
+                </label>
+                <select name="status"
+                        class="w-full border rounded-xl px-4 py-3">
+                    <option value="">Semua Status</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>
+                        Pending
+                    </option>
+                    <option value="waiting_verification" {{ request('status') == 'waiting_verification' ? 'selected' : '' }}>
+                        Waiting Verification
+                    </option>
+                    <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>
+                        Confirmed
+                    </option>
+                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>
+                        Cancelled
+                    </option>
+                </select>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="submit"
+                        class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition">
+                    Filter
+                </button>
+
+                <a href="{{ route('admin.rentals.index') }}"
+                   class="bg-slate-200 text-slate-700 px-6 py-3 rounded-xl font-semibold hover:bg-slate-300 transition">
+                    Reset
+                </a>
+            </div>
+
+        </form>
+    </div>
+
     {{-- ================= TABLE ================= --}}
     <div class="bg-white rounded-2xl shadow overflow-hidden">
 

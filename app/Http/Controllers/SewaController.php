@@ -177,6 +177,9 @@ class SewaController extends Controller
             ->when($request->status, function ($query, $status) {
                 return $query->where('status', $status);
             })
+            ->when($request->transaction_date, function ($query, $transactionDate) {
+                return $query->whereDate('created_at', $transactionDate);
+            })
             ->latest()
             ->paginate(10)
             ->withQueryString();
