@@ -217,10 +217,69 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/admin/rentals/{id}/reset', [SewaController::class, 'resetStatus'])
             ->name('admin.rentals.reset');
 
+        /*
+        |--------------------------------------------------------------------------
+        | DATA USER ADMIN
+        |--------------------------------------------------------------------------
+        */
+
         Route::get('/admin/users', function () {
             $users = \App\Models\User::latest()->paginate(10);
             return view('admin.users.index', compact('users'));
         })->name('admin.users.index');
+
+        // ✅ EDIT USER
+        Route::get('/admin/users/{id}/edit', function ($id) {
+            $user = \App\Models\User::findOrFail($id);
+            return view('admin.users.edit', compact('user'));
+        })->name('admin.users.edit');
+
+        // ✅ UPDATE USER
+        Route::put('/admin/users/{id}', function (\Illuminate\Http\Request $request, $id) {
+            $user = \App\Models\User::findOrFail($id);
+
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'phone' => 'required',
+                'nik' => 'nullable',
+                'address' => 'nullable',
+            ]);
+
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'nik' => $request->nik,
+                'address' => $request->address,
+            ]);
+
+            return redirect()->route('admin.users.index')
+                ->with('success', 'Data user berhasil diperbarui.');
+        })->name('admin.users.update');
+
+        // ✅ HAPUS USER
+        Route::delete('/admin/users/{id}', function ($id) {
+            $user = \App\Models\User::findOrFail($id);
+
+            // Biar admin utama tidak ikut kehapus
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.users.index')
+                    ->with('error', 'User admin tidak dapat dihapus.');
+            }
+
+            $user->delete();
+
+            return redirect()->route('admin.users.index')
+                ->with('success', 'Data user berhasil dihapus.');
+        })->name('admin.users.destroy');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | KELOLA BRAND
+        |--------------------------------------------------------------------------
+        */
 
         Route::get('/admin/brands', [BrandController::class,'index'])
             ->name('brands.index');
